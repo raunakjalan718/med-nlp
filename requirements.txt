@@ -1,0 +1,6 @@
+torch
+torchvision
+Pillow
+pytesseract
+spacy
+scikit-learn
