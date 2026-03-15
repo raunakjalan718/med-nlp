@@ -29,14 +29,11 @@ function App() {
   };
 
   return (
-    // Dark background with a subtle gradient mesh
     <div className="min-h-screen bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black flex items-center justify-center p-6 font-sans text-slate-200">
       
-      {/* The Glass Container */}
-      <div className="max-w-2xl w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-[0_0_40px_rgba(30,58,138,0.15)] p-8 relative overflow-hidden">
+      <div className="max-w-3xl w-full bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-[0_0_50px_rgba(6,182,212,0.1)] p-8 relative overflow-hidden">
         
-        {/* Glow effect blob behind the glass */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-cyan-500/20 blur-[100px] -z-10 rounded-full pointer-events-none"></div>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-40 bg-cyan-600/10 blur-[120px] -z-10 rounded-full pointer-events-none"></div>
 
         <div className="text-center mb-10">
           <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 tracking-tight drop-shadow-sm">
@@ -61,68 +58,78 @@ function App() {
             </div>
             
             <div className="pt-6 border-t border-white/10">
-                <p className="text-center text-xs font-bold text-slate-500 mb-5 uppercase tracking-widest">Select NLP Processing Route</p>
-                <div className="grid grid-cols-2 gap-4">
-                <button 
-                    onClick={() => handleProcess("DOCUMENT")}
-                    disabled={!file || isLoading}
-                    className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold py-4 px-4 rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 transition-all duration-300"
-                >
-                    {isLoading ? 'Running NLP...' : 'Extract Entities'}
-                </button>
-                <button 
-                    onClick={() => handleProcess("SCAN")}
-                    disabled={!file || isLoading}
-                    className="bg-white/5 border border-white/10 text-slate-300 font-bold py-4 px-4 rounded-xl hover:bg-white/10 disabled:opacity-50 transition-all duration-300"
-                >
-                    Save as Image
-                </button>
+                <div className="flex justify-center">
+                    <button 
+                        onClick={() => handleProcess("DOCUMENT")}
+                        disabled={!file || isLoading}
+                        className="w-full max-w-md bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold py-4 px-4 rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 transition-all duration-300 tracking-wide"
+                    >
+                        {isLoading ? 'Running NLP Engine...' : 'Extract & Structure Data'}
+                    </button>
                 </div>
             </div>
           </div>
         )}
 
-        {/* STEP 2: RESULTS */}
+        {/* STEP 2: RESULTS (THE TABLE STRUCTURE) */}
         {step === 2 && extractedData && (
-          <div className="space-y-6 animate-fade-in relative z-10">
+          <div className="space-y-8 animate-fade-in relative z-10">
             <div className="flex justify-between items-end border-b border-white/10 pb-4">
-              <h2 className="text-xl font-bold text-white tracking-wide">Structured Output</h2>
-              <button onClick={() => {setStep(1); setFile(null); setExtractedData(null);}} className="text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition">Scan Another</button>
+              <h2 className="text-2xl font-bold text-white tracking-wide">Clinical Extraction Report</h2>
+              <button onClick={() => {setStep(1); setFile(null); setExtractedData(null);}} className="text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition">Upload New</button>
             </div>
 
-            <div className="grid gap-4">
-              {Object.entries(extractedData).map(([key, value]) => (
-                <div key={key} className="bg-slate-900/50 border border-white/5 rounded-xl p-5 hover:bg-slate-900/70 transition duration-300">
-                  <h3 className="text-[10px] font-bold text-cyan-500/80 uppercase tracking-widest mb-3">{key.replace(/_/g, ' ')}</h3>
-                  
-                  {/* Handle Objects (like Patient Details) */}
-                  {value !== null && typeof value === 'object' && !Array.isArray(value) ? (
-                     <div className="grid grid-cols-2 gap-2">
-                        {Object.entries(value).map(([subKey, subVal]) => (
-                            <div key={subKey} className="text-sm">
-                                <span className="text-slate-400">{subKey.replace(/_/g, ' ')}: </span>
-                                <span className="text-slate-100 font-medium">{subVal}</span>
-                            </div>
-                        ))}
-                     </div>
-                  ) : 
-                  /* Handle Arrays (like Medicines or Doctors) */
-                  Array.isArray(value) ? (
-                    <div className="flex flex-col gap-2">
-                      {value.map((tag, i) => (
-                        <div key={i} className="bg-cyan-500/10 border border-cyan-500/20 text-cyan-100 shadow-sm text-sm font-medium px-4 py-2 rounded-lg">
-                            {tag}
-                        </div>
-                      ))}
-                    </div>
-                  ) : 
-                  /* Handle plain strings (like Document Type) */
-                  (
-                    <p className="text-slate-100 font-medium text-sm">{value}</p>
-                  )}
-                </div>
-              ))}
+            {/* Patient & Doctor Table */}
+            <div className="bg-slate-900/60 border border-white/10 rounded-2xl overflow-hidden shadow-inner">
+                <table className="w-full text-left text-sm text-slate-300">
+                    <thead className="bg-white/5 text-cyan-400/90 text-xs uppercase font-bold tracking-widest border-b border-white/10">
+                        <tr>
+                            <th className="px-6 py-4 w-1/3">Category</th>
+                            <th className="px-6 py-4">Extracted Details</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                        <tr className="hover:bg-white/5 transition">
+                            <td className="px-6 py-4 font-semibold text-slate-400">Patient Name</td>
+                            <td className="px-6 py-4 text-white font-medium">{extractedData.Patient_Name}</td>
+                        </tr>
+                        <tr className="hover:bg-white/5 transition">
+                            <td className="px-6 py-4 font-semibold text-slate-400">Age / Sex</td>
+                            <td className="px-6 py-4 text-white font-medium">{extractedData.Patient_Age_Sex}</td>
+                        </tr>
+                        <tr className="hover:bg-white/5 transition">
+                            <td className="px-6 py-4 font-semibold text-slate-400">Attending Doctor(s)</td>
+                            <td className="px-6 py-4 text-white font-medium">
+                                {extractedData.Doctor_Details?.map((doc, i) => (
+                                    <div key={i} className="mb-1 last:mb-0">{doc}</div>
+                                ))}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+
+            {/* Medicines Table */}
+            <div className="bg-slate-900/60 border border-white/10 rounded-2xl overflow-hidden shadow-inner">
+                <table className="w-full text-left text-sm text-slate-300">
+                    <thead className="bg-white/5 text-cyan-400/90 text-xs uppercase font-bold tracking-widest border-b border-white/10">
+                        <tr>
+                            <th className="px-6 py-4">Prescribed Medications & Dosages</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                        {extractedData.Prescribed_Medicines?.map((med, i) => (
+                            <tr key={i} className="hover:bg-white/5 transition">
+                                <td className="px-6 py-4 flex items-center">
+                                    <span className="h-2 w-2 rounded-full bg-cyan-500 mr-3 shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
+                                    <span className="text-white font-medium text-[15px]">{med}</span>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
           </div>
         )}
       </div>
